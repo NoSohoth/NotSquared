@@ -221,6 +221,7 @@ void Pong::hit()
 						if ((*bullet)->getPlayersBullet() == true
 							&& ch != _mobiles.begin()) {
 							ch = _mobiles.erase(ch);
+							bullet = _mobiles.erase(bullet);
 						}
 						// If not, he's the player
 						//else ch = _mobiles.erase(ch);
