@@ -16,4 +16,5 @@ class Color {
     int _green;
     int _blue;
 };
+
 #endif

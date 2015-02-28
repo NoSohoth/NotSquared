@@ -191,13 +191,24 @@ void Pong::handleEvents(bool& space,
 
 void Pong::insertEnnemies()
 {
-	
+	//The ennemies are triangles contained in the _mobiles list
+	for (int i=1; i<50; i++)
+	{
+		addMobile(new Triangle(rand()%5000 + _width,
+			rand()%(5*_height/8) + _height/8, 100, 100, M_PI,
+			Color(0,255,0), M_PI, 100, -1, false));
+/*		addMobile(new Circle(3*winW/4, winH/2,
+							 75, 75,
+							 i*M_PI/25.0, red, 100));
+*/	}
 }
 
 
 void Pong::insertPlayer()
 {
-	
+	//The player is the first triangle in the _mobiles list
+	addMobile(new Triangle(_width/5.0, _height/2.0, 40, 40, 0.0,
+		Color(0,153,255), 0.0, 0, -1, false));
 }
 
 
