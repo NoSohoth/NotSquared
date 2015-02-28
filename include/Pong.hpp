@@ -35,8 +35,9 @@ class Pong {
 		void collision();
 		void createBorders();
 		void drawAll();
+		void hit();
 		void handleEvents(bool&, bool&, bool&, bool&, bool&);
-		void insertEnnemies();
+		void insertEnemies();
 		void insertPlayer();
 		void moveAll(double dt);
 		void movePlayer(bool, bool, bool, bool);

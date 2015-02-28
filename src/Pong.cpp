@@ -21,7 +21,7 @@ void Pong::addMobile(Mobile* m)
 void Pong::collision()
 {
 	for (list<Mobile*>::iterator itM=_mobiles.begin();
-		itM!=_mobiles.end(); itM++) {
+			itM!=_mobiles.end(); itM++) {
 
 		//Mobile modeling
 		double infMobX = (*itM)->getX();
@@ -188,10 +188,53 @@ void Pong::handleEvents(bool& space,
 	}
 }
 
-
-void Pong::insertEnnemies()
+void Pong::hit()
 {
-	//The ennemies are triangles contained in the _mobiles list
+	// For each bullet
+	for (list<Mobile*>::iterator bullet=_mobiles.begin();
+			bullet!=_mobiles.end(); bullet++) {
+		if (dynamic_cast<Circle*>(*bullet) != 0) {
+
+			// Bullet center coordinates
+			double bRadius = (*bullet)->getWidth()/2;
+			double bX = (*bullet)->getX() + bRadius;
+			double bY = (*bullet)->getY() + bRadius;
+
+			// For each characters (player and enemies)
+			for (list<Mobile*>::iterator ch=_mobiles.begin();
+					ch!=_mobiles.end(); ch++) {
+				if (dynamic_cast<Triangle*>(*ch) != 0) {
+
+					// Character's center coordinates
+					double cX = (*ch)->getX();
+					double cY = (*ch)->getY();
+					// Distance between the two
+					double distance = sqrt( pow(cX-bX,2) + pow(cY-bY,2)  );
+					// The hitbox is a circle
+					double hitboxRadius = (*ch)->getWidth()/2;
+
+					// Is the character hit ?
+					if (distance < hitboxRadius + bRadius) {
+
+						// Is the bullet coming from the player and the hit
+						// character an enemy ?
+						if ((*bullet)->getPlayersBullet() == true
+							&& ch != _mobiles.begin()) {
+							ch = _mobiles.erase(ch);
+						}
+						// If not, he's the player
+						//else ch = _mobiles.erase(ch);
+					}
+				}
+			}
+		}
+	}
+}
+
+
+void Pong::insertEnemies()
+{
+	//The enemies are triangles contained in the _mobiles list
 	for (int i=1; i<50; i++)
 	{
 		addMobile(new Triangle(rand()%5000 + _width,
@@ -245,6 +288,8 @@ void Pong::movePlayer(bool up, bool down, bool left, bool right)
 
 void Pong::popCircles(double dt)
 {
+	// Remove enemies' bullets when their lifeTime is greater than maxLifeTime
+	// and player's bullets when they're out of the window
 	for (list<Mobile*>::iterator it=_mobiles.begin();
 			it!=_mobiles.end(); it++) {
 
@@ -296,15 +341,18 @@ void Pong::execute()
 	_win->setKeyRepeatEnabled(false);
 	createBorders();
 	insertPlayer();
-	insertEnnemies();
+	insertEnemies();
 
 	while (_win->isOpen()) {
 		// FPS
 		sf::Time dt = clock.restart();
 		cout << 1 / dt.asSeconds() << endl;
 
-		// Check circles' lifeTime
+		// Handle enemies' bullets
 		popCircles(dt.asSeconds());
+
+		// Did anyone hit anyone ?
+		hit();
 
 		// Display
 		_win->clear(sf::Color(128, 128, 128));
