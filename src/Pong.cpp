@@ -5,59 +5,18 @@
 
 using namespace std;
 
+
 void Pong::addWall(Wall* w)
 {
 	_walls.push_back(w);
 }
+
 
 void Pong::addMobile(Mobile* m)
 {
 	_mobiles.push_back(m);
 }
 
-void Pong::drawAll()
-{
-	for (list<Wall*>::iterator it=_walls.begin();
-			it!=_walls.end(); it++) {
-		(*it)->draw(_win);
-	}
-	for (list<Mobile*>::iterator it=_mobiles.begin();
-			it!=_mobiles.end(); it++) {
-       	(*it)->draw(_win);
-	}
-}
-
-void Pong::moveAll(double dt)
-{
-	for (list<Mobile*>::iterator it=_mobiles.begin();
-			it!=_mobiles.end(); it++) {
-		(*it)->move(dt);
-	}
-}
-
-void Pong::popCircles(double dt)
-{
-	for (list<Mobile*>::iterator it=_mobiles.begin();
-			it!=_mobiles.end(); it++) {
-
-		if (dynamic_cast<Circle*>(*it) != 0) {
-			double lT = (*it)->getLifeTime();
-			bool p = (*it)->getPlayersBullet();
-
-			if (p == true) {
-				double infX = (*it)->getX();
-				double supX = infX + (*it)->getWidth();
-				double infY = (*it)->getY();
-				double supY = infY + (*it)->getHeight();
-				if (infX>_width || supX<0.0 || infY>_height || supY<0.0) {
-					it = _mobiles.erase(it);
-				}
-			}
-			else if (lT > _maxLifeTime) it = _mobiles.erase(it);
-			else (*it)->setLifeTime(lT + dt);
-		}
-	}
-}
 
 void Pong::collision()
 {
@@ -145,6 +104,7 @@ void Pong::collision()
 	}
 }
 
+
 void Pong::createBorders()
 {
 	for (int i=0; i<8; i++)	{
@@ -167,40 +127,19 @@ void Pong::createBorders()
 	}*/
 }
 
-void Pong::movePlayer(bool up, bool down, bool left, bool right)
+
+void Pong::drawAll()
 {
-	if (up == false && down == false && left == false && right == false) 
-		_mobiles.front()->setSpeed(0);
-	else {
-		_mobiles.front()->setSpeed(_movementSpeed);
-		if (up == true) {
-			if (left == true) _mobiles.front()->setDirection(3*M_PI_4);
-			else if (right == true) _mobiles.front()->setDirection(M_PI_4);
-			else _mobiles.front()->setDirection(M_PI_2);
-		}
-		else if (down == true) {
-			if (left == true) _mobiles.front()->setDirection(- 3*M_PI_4);
-			else if (right == true) _mobiles.front()->setDirection(- M_PI_4);
-			else _mobiles.front()->setDirection(- M_PI_2);
-		}
-		else if (left == true) _mobiles.front()->setDirection(M_PI);
-		else if (right == true) _mobiles.front()->setDirection(0.0);
+	for (list<Wall*>::iterator it=_walls.begin();
+			it!=_walls.end(); it++) {
+		(*it)->draw(_win);
+	}
+	for (list<Mobile*>::iterator it=_mobiles.begin();
+			it!=_mobiles.end(); it++) {
+       	(*it)->draw(_win);
 	}
 }
 
-void Pong::shoot()
-{
-	addMobile(new Circle(_mobiles.front()->getX() + 7, // + circle height / 2
-						 _mobiles.front()->getY() - 7, // - circle height / 2
-						 14,
-						 14,
-						 0.0,
-						 Color(255, 255, 255),
-						 0.0,
-						 1000,
-						 5.0,
-						 true));
-}
 
 void Pong::handleEvents(bool& space,
 						bool& up,
@@ -249,6 +188,90 @@ void Pong::handleEvents(bool& space,
 	}
 }
 
+
+void Pong::insertEnnemies()
+{
+	
+}
+
+
+void Pong::insertPlayer()
+{
+	
+}
+
+
+void Pong::moveAll(double dt)
+{
+	for (list<Mobile*>::iterator it=_mobiles.begin();
+			it!=_mobiles.end(); it++) {
+		(*it)->move(dt);
+	}
+}
+
+
+void Pong::movePlayer(bool up, bool down, bool left, bool right)
+{
+	if (up == false && down == false && left == false && right == false) 
+		_mobiles.front()->setSpeed(0);
+	else {
+		_mobiles.front()->setSpeed(_movementSpeed);
+		if (up == true) {
+			if (left == true) _mobiles.front()->setDirection(3*M_PI_4);
+			else if (right == true) _mobiles.front()->setDirection(M_PI_4);
+			else _mobiles.front()->setDirection(M_PI_2);
+		}
+		else if (down == true) {
+			if (left == true) _mobiles.front()->setDirection(- 3*M_PI_4);
+			else if (right == true) _mobiles.front()->setDirection(- M_PI_4);
+			else _mobiles.front()->setDirection(- M_PI_2);
+		}
+		else if (left == true) _mobiles.front()->setDirection(M_PI);
+		else if (right == true) _mobiles.front()->setDirection(0.0);
+	}
+}
+
+
+void Pong::popCircles(double dt)
+{
+	for (list<Mobile*>::iterator it=_mobiles.begin();
+			it!=_mobiles.end(); it++) {
+
+		if (dynamic_cast<Circle*>(*it) != 0) {
+			double lT = (*it)->getLifeTime();
+			bool p = (*it)->getPlayersBullet();
+
+			if (p == true) {
+				double infX = (*it)->getX();
+				double supX = infX + (*it)->getWidth();
+				double infY = (*it)->getY();
+				double supY = infY + (*it)->getHeight();
+				if (infX>_width || supX<0.0 || infY>_height || supY<0.0) {
+					it = _mobiles.erase(it);
+				}
+			}
+			else if (lT > _maxLifeTime) it = _mobiles.erase(it);
+			else (*it)->setLifeTime(lT + dt);
+		}
+	}
+}
+
+
+void Pong::shoot()
+{
+	addMobile(new Circle(_mobiles.front()->getX() + 7, // + circle height / 2
+						 _mobiles.front()->getY() - 7, // - circle height / 2
+						 14,
+						 14,
+						 0.0,
+						 Color(255, 255, 255),
+						 0.0,
+						 1000,
+						 5.0,
+						 true));
+}
+
+
 void Pong::execute()
 {
 	sf::Clock clock;
@@ -261,6 +284,8 @@ void Pong::execute()
 
 	_win->setKeyRepeatEnabled(false);
 	createBorders();
+	insertPlayer();
+	insertEnnemies();
 
 	while (_win->isOpen()) {
 		// FPS

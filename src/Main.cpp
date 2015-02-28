@@ -30,9 +30,9 @@ int main(void)
 		0.0, blue2, 0.0, 0, -1, false));
 
 	// Adding ennemies
-	for (int i=1; i<100; i++)
+	for (int i=1; i<10; i++)
 	{
-		game.addMobile(new Triangle(rand()%10000 + winW,
+		game.addMobile(new Triangle(rand()%5000 + winW,
 			rand()%(5*winH/8) + winH/8, 100, 100, M_PI,
 			green, M_PI, 100, -1, false));
 /*		game.addMobile(new Circle(3*winW/4, winH/2,

@@ -31,16 +31,18 @@ class Pong {
 
 		void addWall(Wall* w);
 		void addMobile(Mobile* m);
-		void drawAll();
-		void moveAll(double dt);
-		void popCircles(double dt);
 		void collision();
 		void createBorders();
-		void movePlayer(bool, bool, bool, bool);
-		void shoot();
+		void drawAll();
 		void handleEvents(bool&, bool&, bool&, bool&, bool&);
-		void execute();
+		void insertEnnemies();
+		void insertPlayer();
+		void moveAll(double dt);
+		void movePlayer(bool, bool, bool, bool);
+		void popCircles(double dt);
+		void shoot();
 
+		void execute();
 };
 
 #endif
