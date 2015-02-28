@@ -13,10 +13,10 @@ int main(void)
 	int winH = 768;
 	int wallThickness = winH / 50;
 	int movementSpeed = 500;
-	int fireRate = 333; //shoot every 'fireRate' frame
+	double fireRate = 0.10; //shoot every 'fireRate' seconds
 	int maxLifeTime = 7;
 	Pong game("NotSquared", winW, winH, wallThickness, movementSpeed,
-			  fireRate, maxLifeTime);
+			  maxLifeTime, fireRate);
 	
 	// Run it !
 	game.execute();

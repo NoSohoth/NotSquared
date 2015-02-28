@@ -12,20 +12,21 @@ class Pong {
 	private:
 		std::string _name;
     	int _width, _height;
-		int _wallThickness, _movementSpeed, _fireRate, _maxLifeTime;
+		int _wallThickness, _movementSpeed, _maxLifeTime;
+		double _fireRate;
 		std::list<Wall*> _walls;
 		std::list<Mobile*> _mobiles;
     	sf::RenderWindow* _win;
 	
 	public:
-		Pong(std::string n, int w, int h, int wT, int mS, int f, int mLT):
+		Pong(std::string n, int w, int h, int wT, int mS, int mLT, double f):
 			_name(n),
 			_width(w),
 			_height(h),
 			_wallThickness(wT),
 			_movementSpeed(mS),
-			_fireRate(f),
 			_maxLifeTime(mLT),
+			_fireRate(f),
 			_win(new sf::RenderWindow(sf::VideoMode(_width, _height),
 									  _name, sf::Style::Titlebar)) {}
 		~Pong(void) { delete _win; }

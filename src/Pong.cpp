@@ -236,7 +236,7 @@ void Pong::hit()
 void Pong::insertEnemies()
 {
 	//The enemies are triangles contained in the _mobiles list
-	for (int i=1; i<50; i++)
+	for (int i=1; i<500; i++)
 	{
 		addMobile(new Triangle(rand()%5000 + _width,
 			rand()%(5*_height/8) + _height/8, 100, 100, M_PI,
@@ -337,7 +337,7 @@ void Pong::execute()
 	bool left = false;
 	bool right = false;
 	bool space = false;
-	int shootFrameCounter = 0;
+	double shootTimer = 0.0;
 
 	_win->setKeyRepeatEnabled(false);
 	createBorders();
@@ -347,7 +347,7 @@ void Pong::execute()
 	while (_win->isOpen()) {
 		// FPS
 		sf::Time dt = clock.restart();
-		cout << 1 / dt.asSeconds() << endl;
+		//cout << 1 / dt.asSeconds() << endl;
 
 		// Handle enemies' bullets
 		popCircles(dt.asSeconds());
@@ -368,12 +368,13 @@ void Pong::execute()
 
 		// Shoot according to the _fireRate
 		if (space) {	
-			if (shootFrameCounter <= 0) {
+			if (shootTimer <= 0.0) {
 				shoot();
-				shootFrameCounter = _fireRate;
+				shootTimer = _fireRate;
 			}
-			else shootFrameCounter--;
+			else shootTimer -= dt.asSeconds();
 		}
-		else shootFrameCounter = 0;
+		else shootTimer = 0;
+		cout << shootTimer << endl;
 	}
 }
