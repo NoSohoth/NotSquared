@@ -16,9 +16,10 @@ int main(void)
 	int maxLife = 5; //Number of lives at the beginning
 	double shootRate = 0.15; //shoot every 'fireRate' seconds
 	double bulletHellRate = 0.5;
+	bool enableMusic = false;
 	
 	Pong game("NotSquared", winW, winH, wallThickness, movementSpeed, maxLife,
-			  shootRate, bulletHellRate);
+			  shootRate, bulletHellRate, enableMusic);
 	
 	// Run it !
 	game.execute();

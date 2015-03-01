@@ -408,11 +408,13 @@ void Pong::execute()
 	// Load textures & sounds
 	if (!tHeart.loadFromFile("textures/heart.png")) return;
 	if (!tStar.loadFromFile("textures/star.png")) return;
-	if (!music.openFromFile("sounds/background.ogg")) return;
+	if (_enableMusic) {
+		if (!music.openFromFile("sounds/background.ogg")) return;
+	}
 
 	// Load game
 	_win->setKeyRepeatEnabled(false);
-	music.play();
+	if (_enableMusic) music.play();
 	generateStars(tStar, true);
 	createBorders();
 	insertPlayer();

@@ -16,6 +16,7 @@ class Pong {
     	int _width, _height;
 		int _wallThickness, _movementSpeed, _maxLife;
 		double _shootRate, _bulletHellRate;
+		bool _enableMusic;
     	sf::RenderWindow* _win;
 		std::list<Mobile*> _mobiles;
 		std::vector<Sprite> _hearts;
@@ -24,7 +25,7 @@ class Pong {
 	
 	public:
 		Pong(std::string n, int w, int h, int wT, int mS, int mL, double s,
-				double bHR):
+				double bHR, bool eM):
 			_name(n),
 			_width(w),
 			_height(h),
@@ -33,6 +34,7 @@ class Pong {
 			_maxLife(mL),
 			_shootRate(s),
 			_bulletHellRate(bHR),
+			_enableMusic(eM),
 			_win(new sf::RenderWindow(sf::VideoMode(_width, _height),
 									  _name, sf::Style::Titlebar)) {}
 		~Pong(void) { delete _win; }
