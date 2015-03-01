@@ -3,6 +3,7 @@
 
 #include <list>
 #include "SFML/Graphics.hpp"
+#include "SFML/Audio.hpp"
 #include "Wall.hpp"
 #include "Mobile.hpp"
 #include "Circle.hpp"

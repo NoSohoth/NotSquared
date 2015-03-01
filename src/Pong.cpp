@@ -25,7 +25,7 @@ void Pong::bulletHell()
 		if (dynamic_cast<Triangle*>(*enemy) != 0 && enemy != _mobiles.begin()) {
 			for (int i=0; i<3; i++) {
 				addMobile(new Circle((*enemy)->getX(), (*enemy)->getY() - 5,
-					10, 10, 0.0, _MAROON, 2*i*M_PI/3.0, 100, false));
+					10, 10, 0.0, _MAROON, 2*i*M_PI/3.0, 100, false, -1));
 			}	
 		}
 	}
@@ -227,18 +227,22 @@ void Pong::hit()
 					// The hitbox is a circle
 					double hitboxRadius = (*ch)->getWidth()/2;
 
-					// Is the character hit ?
-					if (distance < hitboxRadius + bRadius) {
-
-						// Is the bullet coming from the player and the hit
-						// character an enemy ?
-						if ((*bullet)->getPlayersBullet() == true
-							&& ch != _mobiles.begin()) {
-							ch = _mobiles.erase(ch);
-							bullet = _mobiles.erase(bullet);
-						}
-						// If not, he's the player
-						//else ch = _mobiles.erase(ch);
+					// Did the player get hit ?
+					if (ch == _mobiles.begin()
+							&& (*bullet)->getPlayersBullet() == false
+							&& distance < bRadius) {
+						int currentLives = (*ch)->getPlayersLives() - 1;
+						cout << currentLives << endl;
+						if (currentLives == 0) _win->close();
+						else (*ch)->setPlayersLives(currentLives);
+						bullet = _mobiles.erase(bullet);
+					}
+					// Or maybe an enemy got hit by a player's bullet ?
+					else if (ch != _mobiles.begin()
+							&& (*bullet)->getPlayersBullet() == true
+							&& distance < hitboxRadius + bRadius) {
+						ch = _mobiles.erase(ch);
+						bullet = _mobiles.erase(bullet);
 					}
 				}
 			}
@@ -254,7 +258,7 @@ void Pong::insertEnemies()
 	{
 		addMobile(new Triangle(rand()%5000 + _width,
 			rand()%(5*_height/8) + _height/8, 50, 50, M_PI,
-			_GREEN, M_PI, 200, false));
+			_GREEN, M_PI, 200, false, -1));
 /*		addMobile(new Circle(3*winW/4, winH/2,
 							 75, 75,
 							 i*M_PI/25.0, red, 100));
@@ -266,7 +270,7 @@ void Pong::insertPlayer()
 {
 	//The player is the first triangle in the _mobiles list
 	addMobile(new Triangle(_width/5.0, _height/2.0, 40, 40, 0.0,
-		_CRIMSON, 0.0, 0, false));
+		_CRIMSON, 0.0, 0, false, 3));
 }
 
 
@@ -324,13 +328,14 @@ void Pong::shoot()
 {
 	addMobile(new Circle(_mobiles.front()->getX() + 7, // + circle height / 2
 						 _mobiles.front()->getY() - 7, // - circle height / 2
-						 14, 14, 0.0, _WHITE, 0.0, 1000, true));
+						 14, 14, 0.0, _WHITE, 0.0, 1000, true, -1));
 }
 
 
 void Pong::execute()
 {
 	sf::Clock clock;
+	sf::Music music;
 	bool up = false;
 	bool down = false;
 	bool left = false;
@@ -338,9 +343,14 @@ void Pong::execute()
 	bool space = false;
 	double shootTimer = 0.0;
 	double bulletHellTimer = 0.0;
-	Texture texture(0.0, 0.0, _height, _width, "Textures/background.jpg");
 
+	// Load data
+	Texture texture(0.0, 0.0, _height, _width, "textures/background.jpg");
+	if (!music.openFromFile("sounds/background.ogg")) return;
+
+	// Load game
 	_win->setKeyRepeatEnabled(false);
+	music.play();
 	createBorders();
 	insertPlayer();
 	insertEnemies();
@@ -348,7 +358,7 @@ void Pong::execute()
 	while (_win->isOpen()) {
 		// FPS
 		sf::Time dt = clock.restart();
-		cout << 1 / dt.asSeconds() << endl;
+		//cout << 1 / dt.asSeconds() << endl;
 
 		// Events & inputs
 		handleEvents(space, up, down, left, right);

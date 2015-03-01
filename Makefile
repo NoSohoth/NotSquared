@@ -10,7 +10,7 @@ OBJ=$(SRC:.cpp=.o)
 CC=g++
 CCFLAGS=-W -Wall -Wextra -pedantic -g -Wno-long-long
 IFLAGS=-I$(SFMLDIR)/include -I./include
-LDFLAGS=-L$(SFMLDIR)/lib -lsfml-graphics -lsfml-window -lsfml-system \
+LDFLAGS=-L$(SFMLDIR)/lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio \
         -Wl,-rpath,${SFMLDIR}/lib
 
 #-- main target to obtain --
