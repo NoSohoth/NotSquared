@@ -21,10 +21,10 @@ class Color {
 // Defining some colors
 const Color _RED(255, 0, 0);
 const Color _GREEN(0, 255, 0);
-const Color _BLUE(0, 0, 255);
+const Color _BLUE(0, 255, 255);
 const Color _WHITE(255, 255, 255);
 const Color _BLACK(0, 0, 0);
-const Color _CRIMSON(220, 20, 60);
+const Color _CRIMSON(220, 10, 30);
 const Color _MAROON(255, 52, 179);
 
 #endif

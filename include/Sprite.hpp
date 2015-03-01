@@ -24,6 +24,10 @@ class Sprite {
 			_spriteXA(sXA), _spriteYA(sYA), _spriteXB(sXB), _spriteYB(sYB) {}
 		~Sprite(void) {}
 
+		double getX() { return _x; }
+		double getScale() { return _scale; }
+		double getSpriteXB() { return _spriteXB; }
+
 		void move(double dt);
 		void draw(sf::RenderWindow *win) const;
 };

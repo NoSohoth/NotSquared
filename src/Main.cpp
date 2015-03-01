@@ -13,9 +13,9 @@ int main(void)
 	int winH = 768;
 	int wallThickness = winH / 50;
 	int movementSpeed = 500;
-	int maxLife = 5; //Number of lives at the beginning
+	int maxLife = 8; //Number of lives at the beginning
 	double shootRate = 0.15; //shoot every 'fireRate' seconds
-	double bulletHellRate = 0.5;
+	double bulletHellRate = 0.3;
 	bool enableMusic = false;
 	
 	Pong game("NotSquared", winW, winH, wallThickness, movementSpeed, maxLife,

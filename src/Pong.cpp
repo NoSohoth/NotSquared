@@ -35,9 +35,9 @@ void Pong::bulletHell()
 	for (list<Mobile*>::iterator enemy=_mobiles.begin();
 			enemy!=_mobiles.end(); enemy++) {
 		if (dynamic_cast<Triangle*>(*enemy) != 0 && enemy != _mobiles.begin()) {
-			for (int i=0; i<3; i++) {
+			for (int i=-1; i<2; i++) {
 				addMobile(new Circle((*enemy)->getX(), (*enemy)->getY() - 5,
-					10, 10, 0.0, _MAROON, 2*i*M_PI/3.0, 100, false, -1));
+					10, 10, 0.0, _MAROON, M_PI + i*M_PI/9.0, 250, false, -1));
 			}	
 		}
 	}
@@ -183,7 +183,7 @@ void Pong::generateStars(sf::Texture tStar, bool firstCall)
 			(rand()%8)/100.0, M_PI, 40, 0.0, 0.0, 200.0, 200.0));
 	}
 	else {
-		for (int i=0; i<100; i++) {
+		for (int i=0; i<150; i++) {
 			addStar(Sprite(tStar, rand()%((int) _width), rand()%((int) _height),
 					(rand()%8)/100.0, M_PI, 40, 0.0, 0.0, 200.0, 200.0));
 		}
@@ -290,11 +290,11 @@ bool Pong::hit(bool playerIsInvulnerable)
 void Pong::insertEnemies()
 {
 	//The enemies are triangles contained in the _mobiles list
-	for (int i=1; i<20; i++)
+	for (int i=1; i<30; i++)
 	{
 		addMobile(new Triangle(rand()%5000 + _width,
 			rand()%(5*_height/8) + _height/8, 50, 50, M_PI,
-			_GREEN, M_PI, 200, false, -1));
+			_GREEN, M_PI, 150, false, -1));
 /*		addMobile(new Circle(3*winW/4, winH/2,
 							 75, 75,
 							 i*M_PI/25.0, red, 100));
@@ -364,11 +364,22 @@ void Pong::removeCircles()
 }
 
 
+void Pong::removeStars()
+{
+	for (vector<Sprite>::iterator it=_stars.begin();
+			it!=_stars.end(); it++) {
+		if (it->getX() + (it->getSpriteXB() * it->getScale()) < 0.0) {
+			it = _stars.erase(it);
+		}
+	}
+}
+
+
 void Pong::shoot()
 {
 	addMobile(new Circle(_mobiles.front()->getX() + 7, // + circle height / 2
 						 _mobiles.front()->getY() - 7, // - circle height / 2
-						 14, 14, 0.0, _WHITE, 0.0, 1000, true, -1));
+						 14, 14, 0.0, _BLUE, 0.0, 1000, true, -1));
 }
 
 
@@ -426,7 +437,7 @@ void Pong::execute()
 		// FPS & delta time //
 		//------------------//
 		sf::Time dt = clock.restart();
-		//cout << 1 / dt.asSeconds() << endl;
+		cout << 1 / dt.asSeconds() << endl;
 
 
 		//--------//
@@ -456,8 +467,9 @@ void Pong::execute()
 		//----------------//
 		// Event handling //
 		//----------------//
-			// Remove out-of-screen bullets
+			// Remove out-of-screen bullets and stars
 		removeCircles();
+		removeStars();
 			// Handle hit characters
 		bool playerHit = hit(playerIsInvulnerable);	// Did anyone hit anyone ?
 		if (playerHit) {
@@ -496,7 +508,7 @@ void Pong::execute()
 			// Build the background with stars using stripes
 		if (starsTimer <= 0.0) {
 			generateStars(tStar, false);
-			starsTimer = 0.5;
+			starsTimer = 0.4;
 		} else starsTimer -= dt.asSeconds();
 			// Draw every entity in SFML
 		drawAll();

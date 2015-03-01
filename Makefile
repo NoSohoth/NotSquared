@@ -23,10 +23,6 @@ $(TARGET) : $(OBJ)
 	$(CC) $^ -o $@ $(LDFLAGS) 
 	@echo
 
-#-- source file header files dependencies --
-#src/Appli.o : include/Window.h
-
-
 #-- compiler command for every source file --
 %.o : %.cpp 
 	@echo Compiling $< ....
