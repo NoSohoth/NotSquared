@@ -180,12 +180,12 @@ void Pong::generateStars(sf::Texture tStar, bool firstCall)
 {
 	if (!firstCall) {
 	addStar(Sprite(tStar, _width, rand()%((int) _height),
-			(rand()%8)/100.0, M_PI, 30, 0.0, 0.0, 200.0, 200.0));
+			(rand()%8)/100.0, M_PI, 40, 0.0, 0.0, 200.0, 200.0));
 	}
 	else {
 		for (int i=0; i<100; i++) {
 			addStar(Sprite(tStar, rand()%((int) _width), rand()%((int) _height),
-					(rand()%8)/100.0, M_PI, 30, 0.0, 0.0, 200.0, 200.0));
+					(rand()%8)/100.0, M_PI, 40, 0.0, 0.0, 200.0, 200.0));
 		}
 	}
 }
@@ -235,7 +235,7 @@ void Pong::handleEvents(bool& space, bool& up, bool& down, bool& left,
 	}
 }
 
-bool Pong::hit()
+bool Pong::hit(bool playerIsInvulnerable)
 {
 	// For each bullet
 	for (list<Mobile*>::iterator bullet=_mobiles.begin();
@@ -263,7 +263,8 @@ bool Pong::hit()
 					// Did the player get hit ?
 					if (ch == _mobiles.begin()
 							&& (*bullet)->getPlayersBullet() == false
-							&& distance < hitboxRadius/3.0 + bRadius) {
+							&& distance < hitboxRadius/3.0 + bRadius
+							&& playerIsInvulnerable == false) {
 						int currentLives = (*ch)->getPlayersLives() - 1;
 						if (currentLives == 0) _win->close();
 						else (*ch)->setPlayersLives(currentLives);
@@ -398,6 +399,7 @@ void Pong::execute()
 	bool left = false;
 	bool right = false;
 	bool space = false;
+	bool playerIsInvulnerable = false;
 	double shootTimer = 0.0;
 	double bulletHellTimer = 0.0;
 	double starsTimer = 0.0;
@@ -455,21 +457,23 @@ void Pong::execute()
 			// Remove out-of-screen bullets
 		removeCircles();
 			// Handle hit characters
-		bool playerHit = hit();			// Did anyone hit anyone ?
+		bool playerHit = hit(playerIsInvulnerable);	// Did anyone hit anyone ?
 		if (playerHit) {
 			updateHearts(tHeart);		// If so, update displayed life count
+			playerIsInvulnerable = true;
 			hitTimer = 2.0;				//Then start a timer
 		}
 			// To make the player blink so that he can see that he got hit
 		if (hitTimer != 0.0) {
-			if (((int) (hitTimer*10.0))%2 == 0) {
-				_mobiles.front()->setColor(_WHITE);
+			if (((int) (hitTimer*20.0))%2 == 0) {
+				_mobiles.front()->setColor(_BLACK);
 			}
 			else _mobiles.front()->setColor(_CRIMSON);
 			hitTimer -= dt.asSeconds();
 			if (hitTimer < 0.0) {
 				hitTimer = 0.0;
 				_mobiles.front()->setColor(_CRIMSON);
+				playerIsInvulnerable = false;
 			}
 		}
 			// Collisions between mobiles and walls
