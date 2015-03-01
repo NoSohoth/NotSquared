@@ -6,15 +6,21 @@
 using namespace std;
 
 
-void Pong::addWall(Wall w)
-{
-	_walls.push_back(w);
-}
-
-
 void Pong::addMobile(Mobile* m)
 {
 	_mobiles.push_back(m);
+}
+
+
+void Pong::addHeart(Sprite s)
+{
+	_hearts.push_back(s);
+}
+
+
+void Pong::addWall(Wall w)
+{
+	_walls.push_back(w);
 }
 
 
@@ -148,9 +154,13 @@ void Pong::drawAll()
 			it!=_walls.end(); it++) {
 		it->draw(_win);
 	}
-	for (list<Mobile*>::iterator it=_mobiles.begin();
-			it!=_mobiles.end(); it++) {
+	for (list<Mobile*>::reverse_iterator it=_mobiles.rbegin();
+			it!=_mobiles.rend(); it++) {
        	(*it)->draw(_win);
+	}
+	for (vector<Sprite>::iterator it=_hearts.begin();
+			it!=_hearts.end(); it++) {
+		it->draw(_win);
 	}
 }
 
@@ -202,7 +212,7 @@ void Pong::handleEvents(bool& space,
 	}
 }
 
-void Pong::hit()
+bool Pong::hit()
 {
 	// For each bullet
 	for (list<Mobile*>::iterator bullet=_mobiles.begin();
@@ -230,12 +240,12 @@ void Pong::hit()
 					// Did the player get hit ?
 					if (ch == _mobiles.begin()
 							&& (*bullet)->getPlayersBullet() == false
-							&& distance < bRadius) {
+							&& distance < hitboxRadius/3.0 + bRadius) {
 						int currentLives = (*ch)->getPlayersLives() - 1;
-						cout << currentLives << endl;
 						if (currentLives == 0) _win->close();
 						else (*ch)->setPlayersLives(currentLives);
 						bullet = _mobiles.erase(bullet);
+						return true;
 					}
 					// Or maybe an enemy got hit by a player's bullet ?
 					else if (ch != _mobiles.begin()
@@ -243,11 +253,13 @@ void Pong::hit()
 							&& distance < hitboxRadius + bRadius) {
 						ch = _mobiles.erase(ch);
 						bullet = _mobiles.erase(bullet);
+						return false;
 					}
 				}
 			}
 		}
 	}
+	return false;
 }
 
 
@@ -270,7 +282,7 @@ void Pong::insertPlayer()
 {
 	//The player is the first triangle in the _mobiles list
 	addMobile(new Triangle(_width/5.0, _height/2.0, 40, 40, 0.0,
-		_CRIMSON, 0.0, 0, false, 3));
+		_CRIMSON, 0.0, 0, false, _maxLife));
 }
 
 
@@ -332,10 +344,28 @@ void Pong::shoot()
 }
 
 
+void Pong::updateHearts(sf::Texture tHeart)
+{
+	int lives = _mobiles.front()->getPlayersLives();
+	_hearts.clear();
+
+	for (int i=0; i<lives; i++) {
+		addHeart(Sprite(tHeart, 20.0 + i*50.0, 20.0, 0.2,
+				0.0, 0.0, 212.0, 201.0));
+	}
+	for (int i=lives; i<_maxLife; i++) {
+		addHeart(Sprite(tHeart, 20.0 + i*50.0, 20.0, 0.2,
+				212.0, 0.0, 424.0, 201.0));
+	}
+}
+
+
 void Pong::execute()
 {
 	sf::Clock clock;
 	sf::Music music;
+	sf::Texture tBackground;
+	sf::Texture tHeart;
 	bool up = false;
 	bool down = false;
 	bool left = false;
@@ -345,8 +375,10 @@ void Pong::execute()
 	double bulletHellTimer = 0.0;
 
 	// Load data
-	Texture texture(0.0, 0.0, _height, _width, "textures/background.jpg");
+	if (!tBackground.loadFromFile("textures/background.jpg")) return;
+	if (!tHeart.loadFromFile("textures/heart.png")) return;
 	if (!music.openFromFile("sounds/background.ogg")) return;
+	Sprite sBackground(tBackground, 0.0, 0.0, 1.0);
 
 	// Load game
 	_win->setKeyRepeatEnabled(false);
@@ -354,11 +386,12 @@ void Pong::execute()
 	createBorders();
 	insertPlayer();
 	insertEnemies();
+	updateHearts(tHeart);
 
 	while (_win->isOpen()) {
 		// FPS
 		sf::Time dt = clock.restart();
-		//cout << 1 / dt.asSeconds() << endl;
+		cout << 1 / dt.asSeconds() << endl;
 
 		// Events & inputs
 		handleEvents(space, up, down, left, right);
@@ -380,14 +413,15 @@ void Pong::execute()
 
 		// Update shapes' characteristics
 		popCircles();					// Remove distant bullets
-		hit();							// Did anyone hit anyone ?
+		bool playerHit = hit();			// Did anyone hit anyone ?
+		if (playerHit) updateHearts(tHeart);	// Update displayed life count
 		collision();					// Collisions between mobiles and walls
 
 		// Apply changes
 		moveAll(dt.asSeconds());
 
 		// Display them
-		texture.draw(_win);
+		sBackground.draw(_win);
 		drawAll();
 		_win->display();
 

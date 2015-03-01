@@ -16,6 +16,6 @@ void Circle::draw(sf::RenderWindow *win) const
     circle.setFillColor(sf::Color(r, g, b));
     circle.setPosition((int)_x, (int)_y);
 	circle.setOutlineColor(sf::Color(0, 0, 0));
-	circle.setOutlineThickness(_height/15);
+	circle.setOutlineThickness(_height/5);
 	win->draw(circle);
 }

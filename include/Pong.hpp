@@ -8,39 +8,42 @@
 #include "Mobile.hpp"
 #include "Circle.hpp"
 #include "Triangle.hpp"
-#include "Texture.hpp"
+#include "Sprite.hpp"
 
 class Pong {
 	private:
 		std::string _name;
     	int _width, _height;
-		int _wallThickness, _movementSpeed;
+		int _wallThickness, _movementSpeed, _maxLife;
 		double _shootRate, _bulletHellRate;
-		std::list<Wall> _walls;
-		std::list<Mobile*> _mobiles;
     	sf::RenderWindow* _win;
+		std::list<Mobile*> _mobiles;
+		std::vector<Sprite> _hearts;
+		std::list<Wall> _walls;
 	
 	public:
-		Pong(std::string n, int w, int h, int wT, int mS, double s,
+		Pong(std::string n, int w, int h, int wT, int mS, int mL, double s,
 				double bHR):
 			_name(n),
 			_width(w),
 			_height(h),
 			_wallThickness(wT),
 			_movementSpeed(mS),
+			_maxLife(mL),
 			_shootRate(s),
 			_bulletHellRate(bHR),
 			_win(new sf::RenderWindow(sf::VideoMode(_width, _height),
 									  _name, sf::Style::Titlebar)) {}
 		~Pong(void) { delete _win; }
 
-		void addWall(Wall w);
 		void addMobile(Mobile* m);
+		void addHeart(Sprite s);
+		void addWall(Wall w);
 		void bulletHell();
 		void collision();
 		void createBorders();
 		void drawAll();
-		void hit();
+		bool hit(); // True if the player lost a life (to updateHearts())
 		void handleEvents(bool&, bool&, bool&, bool&, bool&);
 		void insertEnemies();
 		void insertPlayer();
@@ -48,6 +51,7 @@ class Pong {
 		void movePlayer(bool, bool, bool, bool);
 		void popCircles();
 		void shoot();
+		void updateHearts(sf::Texture);
 
 		void execute();
 };
