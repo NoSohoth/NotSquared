@@ -191,8 +191,8 @@ void Pong::generateStars(sf::Texture tStar, bool firstCall)
 }
 
 
-void Pong::handleEvents(bool& space, bool& up, bool& down, bool& left,
-	bool& right)
+void Pong::handleEvents(bool& pause, bool& space, bool& up, bool& down,
+		bool& left, bool& right)
 {	
 	sf::Event event;
 	if (_win->pollEvent(event)) {
@@ -203,8 +203,8 @@ void Pong::handleEvents(bool& space, bool& up, bool& down, bool& left,
 			case sf::Event::KeyPressed :
 				// Pause game
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-					cout<< "Pause." <<endl;
-					//pause();
+					if (pause == false) pause = true;
+					else pause = false;
 				}
 
 				// Start shooting
@@ -405,11 +405,12 @@ void Pong::execute()
 	sf::Music music;
 	sf::Texture tHeart;
 	sf::Texture tStar;
+	bool pause = false;
+	bool space = false;
 	bool up = false;
 	bool down = false;
 	bool left = false;
 	bool right = false;
-	bool space = false;
 	bool playerIsInvulnerable = false;
 	double shootTimer = 0.0;
 	double bulletHellTimer = 0.0;
@@ -443,7 +444,7 @@ void Pong::execute()
 		//--------//
 		// Inputs //
 		//--------//
-		handleEvents(space, up, down, left, right);
+		handleEvents(pause, space, up, down, left, right);
 		movePlayer(up, down, left, right);
 
 
@@ -491,13 +492,13 @@ void Pong::execute()
 			}
 		}
 			// Collisions between mobiles and walls
-		collision();
+		if (!pause) collision();
 
 
 		//---------------------------------//
 		// Update position of every entity //
 		//---------------------------------//
-		moveAll(dt.asSeconds());
+		if (!pause) moveAll(dt.asSeconds());
 
 
 		//---------//
@@ -506,9 +507,9 @@ void Pong::execute()
 			// Clear screen
 		_win->clear(sf::Color(0, 0, 0));
 			// Build the background with stars using stripes
-		if (starsTimer <= 0.0) {
+		if (!pause && starsTimer <= 0.0) {
 			generateStars(tStar, false);
-			starsTimer = 0.4;
+			starsTimer = 0.2;
 		} else starsTimer -= dt.asSeconds();
 			// Draw every entity in SFML
 		drawAll();

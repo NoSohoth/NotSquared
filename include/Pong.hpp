@@ -49,7 +49,7 @@ class Pong {
 		void drawAll();
 		void generateStars(sf::Texture, bool firstCall);
 		bool hit(bool); // True if the player lost a life (to updateHearts())
-		void handleEvents(bool&, bool&, bool&, bool&, bool&);
+		void handleEvents(bool&, bool&, bool&, bool&, bool&, bool&);
 		void insertEnemies();
 		void insertPlayer();
 		void moveAll(double dt);
