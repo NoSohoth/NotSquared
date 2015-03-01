@@ -36,6 +36,7 @@ class Shape {
 		void setX(double x) { _x=x; }
 		void setY(double y) { _y=y; }
 		void setOrientation(double o) { _orientation = o; }
+		void setColor(Color c) { _color=c; }
 
 		//Other methods
 

@@ -401,6 +401,7 @@ void Pong::execute()
 	double shootTimer = 0.0;
 	double bulletHellTimer = 0.0;
 	double starsTimer = 0.0;
+	double hitTimer = 0.0;
 
 	// Load textures & sounds
 	if (!tHeart.loadFromFile("textures/heart.png")) return;
@@ -417,15 +418,23 @@ void Pong::execute()
 	updateHearts(tHeart);
 
 	while (_win->isOpen()) {
-		// FPS
+		//------------------//
+		// FPS & delta time //
+		//------------------//
 		sf::Time dt = clock.restart();
 		//cout << 1 / dt.asSeconds() << endl;
 
-		// Events & inputs
+
+		//--------//
+		// Inputs //
+		//--------//
 		handleEvents(space, up, down, left, right);
 		movePlayer(up, down, left, right);
 
-		// Timers
+
+		//-----------------//
+		// Bullet handling //
+		//-----------------//
 			// Player
 		if (space) {	
 			if (shootTimer <= 0.0) {
@@ -438,24 +447,54 @@ void Pong::execute()
 			bulletHell();
 			bulletHellTimer = _bulletHellRate;
 		} else bulletHellTimer -= dt.asSeconds();
-	
-		// Update shapes' characteristics
-		removeCircles();					// Remove distant bullets
-		bool playerHit = hit();			// Did anyone hit anyone ?
-		if (playerHit) updateHearts(tHeart);	// Update displayed life count
-		collision();					// Collisions between mobiles and walls
 
-		// Apply changes
+
+		//----------------//
+		// Event handling //
+		//----------------//
+			// Remove out-of-screen bullets
+		removeCircles();
+			// Handle hit characters
+		bool playerHit = hit();			// Did anyone hit anyone ?
+		if (playerHit) {
+			updateHearts(tHeart);		// If so, update displayed life count
+			hitTimer = 2.0;				//Then start a timer
+		}
+			// To make the player blink so that he can see that he got hit
+		if (hitTimer != 0.0) {
+			if (((int) (hitTimer*10.0))%2 == 0) {
+				_mobiles.front()->setColor(_WHITE);
+			}
+			else _mobiles.front()->setColor(_CRIMSON);
+			hitTimer -= dt.asSeconds();
+			if (hitTimer < 0.0) {
+				hitTimer = 0.0;
+				_mobiles.front()->setColor(_CRIMSON);
+			}
+		}
+			// Collisions between mobiles and walls
+		collision();
+
+
+		//---------------------------------//
+		// Update position of every entity //
+		//---------------------------------//
 		moveAll(dt.asSeconds());
 
-		// Display them
+
+		//---------//
+		// Display //
+		//---------//
+			// Clear screen
 		_win->clear(sf::Color(0, 0, 0));
-			// Stars (landscape)
+			// Build the background with stars using stripes
 		if (starsTimer <= 0.0) {
 			generateStars(tStar, false);
 			starsTimer = 0.5;
-		} else starsTimer -= dt.asSeconds();	
+		} else starsTimer -= dt.asSeconds();
+			// Draw every entity in SFML
 		drawAll();
+			// Display them
 		_win->display();
 	}
 }
