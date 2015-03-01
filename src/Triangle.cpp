@@ -1,6 +1,5 @@
 #include <cmath>
 #include "Triangle.hpp"
-#include "Pong.hpp"
 
 
 void Triangle::move(double dt)

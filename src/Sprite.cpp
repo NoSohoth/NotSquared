@@ -1,4 +1,13 @@
+#include <cmath>
 #include "Sprite.hpp"
+
+
+void Sprite::move(double dt)
+{
+	_x += _speed * cos(_direction) * dt;
+	_y += _speed * (- sin(_direction)) * dt;
+}
+
 
 void Sprite::draw(sf::RenderWindow *win) const
 {

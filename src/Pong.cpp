@@ -18,6 +18,12 @@ void Pong::addHeart(Sprite s)
 }
 
 
+void Pong::addStar(Sprite s)
+{
+	_stars.push_back(s);
+}
+
+
 void Pong::addWall(Wall w)
 {
 	_walls.push_back(w);
@@ -55,7 +61,7 @@ void Pong::collision()
 			//Wall modeling
 	        double infWallX = itW->getX();
         	double supWallX = infWallX + itW->getWidth();
-    	    double infWallY = itW->getY();
+			double infWallY = itW->getY();
 	        double supWallY = infWallY + itW->getHeight();
 
 			//Ensure mobiles won't get out of the window (as a last resort !)
@@ -150,6 +156,10 @@ void Pong::createBorders()
 
 void Pong::drawAll()
 {
+	for (vector<Sprite>::iterator it=_stars.begin();
+			it!=_stars.end(); it++) {
+		it->draw(_win);
+	}
 	for (list<Wall>::iterator it=_walls.begin();
 			it!=_walls.end(); it++) {
 		it->draw(_win);
@@ -162,14 +172,27 @@ void Pong::drawAll()
 			it!=_hearts.end(); it++) {
 		it->draw(_win);
 	}
+
 }
 
 
-void Pong::handleEvents(bool& space,
-						bool& up,
-						bool& down,
-						bool& left,
-						bool& right)
+void Pong::generateStars(sf::Texture tStar, bool firstCall)
+{
+	if (!firstCall) {
+	addStar(Sprite(tStar, _width, rand()%((int) _height),
+			(rand()%8)/100.0, M_PI, 30, 0.0, 0.0, 200.0, 200.0));
+	}
+	else {
+		for (int i=0; i<100; i++) {
+			addStar(Sprite(tStar, rand()%((int) _width), rand()%((int) _height),
+					(rand()%8)/100.0, M_PI, 30, 0.0, 0.0, 200.0, 200.0));
+		}
+	}
+}
+
+
+void Pong::handleEvents(bool& space, bool& up, bool& down, bool& left,
+	bool& right)
 {	
 	sf::Event event;
 	if (_win->pollEvent(event)) {
@@ -292,6 +315,10 @@ void Pong::moveAll(double dt)
 			it!=_mobiles.end(); it++) {
 		(*it)->move(dt);
 	}
+	for (vector<Sprite>::iterator it=_stars.begin();
+			it!=_stars.end(); it++) {
+		it->move(dt);
+	}
 }
 
 
@@ -317,7 +344,7 @@ void Pong::movePlayer(bool up, bool down, bool left, bool right)
 }
 
 
-void Pong::popCircles()
+void Pong::removeCircles()
 {
 	// Remove bullets when they're out of the window
 	for (list<Mobile*>::iterator it=_mobiles.begin();
@@ -350,11 +377,11 @@ void Pong::updateHearts(sf::Texture tHeart)
 	_hearts.clear();
 
 	for (int i=0; i<lives; i++) {
-		addHeart(Sprite(tHeart, 20.0 + i*50.0, 20.0, 0.2,
+		addHeart(Sprite(tHeart, 20.0 + i*50.0, 20.0, 0.2, 0.0, 0.0,
 				0.0, 0.0, 212.0, 201.0));
 	}
 	for (int i=lives; i<_maxLife; i++) {
-		addHeart(Sprite(tHeart, 20.0 + i*50.0, 20.0, 0.2,
+		addHeart(Sprite(tHeart, 20.0 + i*50.0, 20.0, 0.2, 0.0, 0.0,
 				212.0, 0.0, 424.0, 201.0));
 	}
 }
@@ -364,8 +391,8 @@ void Pong::execute()
 {
 	sf::Clock clock;
 	sf::Music music;
-	sf::Texture tBackground;
 	sf::Texture tHeart;
+	sf::Texture tStar;
 	bool up = false;
 	bool down = false;
 	bool left = false;
@@ -373,16 +400,17 @@ void Pong::execute()
 	bool space = false;
 	double shootTimer = 0.0;
 	double bulletHellTimer = 0.0;
+	double starsTimer = 0.0;
 
-	// Load data
-	if (!tBackground.loadFromFile("textures/background.jpg")) return;
+	// Load textures & sounds
 	if (!tHeart.loadFromFile("textures/heart.png")) return;
+	if (!tStar.loadFromFile("textures/star.png")) return;
 	if (!music.openFromFile("sounds/background.ogg")) return;
-	Sprite sBackground(tBackground, 0.0, 0.0, 1.0);
 
 	// Load game
 	_win->setKeyRepeatEnabled(false);
 	music.play();
+	generateStars(tStar, true);
 	createBorders();
 	insertPlayer();
 	insertEnemies();
@@ -391,13 +419,13 @@ void Pong::execute()
 	while (_win->isOpen()) {
 		// FPS
 		sf::Time dt = clock.restart();
-		cout << 1 / dt.asSeconds() << endl;
+		//cout << 1 / dt.asSeconds() << endl;
 
 		// Events & inputs
 		handleEvents(space, up, down, left, right);
 		movePlayer(up, down, left, right);
 
-		// Shooting (mobiles generation)
+		// Timers
 			// Player
 		if (space) {	
 			if (shootTimer <= 0.0) {
@@ -410,9 +438,9 @@ void Pong::execute()
 			bulletHell();
 			bulletHellTimer = _bulletHellRate;
 		} else bulletHellTimer -= dt.asSeconds();
-
+	
 		// Update shapes' characteristics
-		popCircles();					// Remove distant bullets
+		removeCircles();					// Remove distant bullets
 		bool playerHit = hit();			// Did anyone hit anyone ?
 		if (playerHit) updateHearts(tHeart);	// Update displayed life count
 		collision();					// Collisions between mobiles and walls
@@ -421,9 +449,13 @@ void Pong::execute()
 		moveAll(dt.asSeconds());
 
 		// Display them
-		sBackground.draw(_win);
+		_win->clear(sf::Color(0, 0, 0));
+			// Stars (landscape)
+		if (starsTimer <= 0.0) {
+			generateStars(tStar, false);
+			starsTimer = 0.5;
+		} else starsTimer -= dt.asSeconds();	
 		drawAll();
 		_win->display();
-
 	}
 }

@@ -19,6 +19,7 @@ class Pong {
     	sf::RenderWindow* _win;
 		std::list<Mobile*> _mobiles;
 		std::vector<Sprite> _hearts;
+		std::vector<Sprite> _stars;
 		std::list<Wall> _walls;
 	
 	public:
@@ -38,18 +39,21 @@ class Pong {
 
 		void addMobile(Mobile* m);
 		void addHeart(Sprite s);
+		void addStar(Sprite s);
 		void addWall(Wall w);
 		void bulletHell();
 		void collision();
 		void createBorders();
 		void drawAll();
+		void generateStars(sf::Texture, bool firstCall);
 		bool hit(); // True if the player lost a life (to updateHearts())
 		void handleEvents(bool&, bool&, bool&, bool&, bool&);
 		void insertEnemies();
 		void insertPlayer();
 		void moveAll(double dt);
 		void movePlayer(bool, bool, bool, bool);
-		void popCircles();
+		void removeCircles();
+		void removeStars();
 		void shoot();
 		void updateHearts(sf::Texture);
 

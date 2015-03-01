@@ -1,12 +1,13 @@
 #include <cmath>
-#include "SFML/Graphics.hpp"
 #include "Circle.hpp"
+
 
 void Circle::move(double dt) 
 {
 	_x += _speed * cos(_direction) * dt;
     _y += _speed * (- sin(_direction)) * dt; //y axis points down
 }
+
 
 void Circle::draw(sf::RenderWindow *win) const
 {
