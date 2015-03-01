@@ -6,7 +6,7 @@
 using namespace std;
 
 
-void Pong::addWall(Wall* w)
+void Pong::addWall(Wall w)
 {
 	_walls.push_back(w);
 }
@@ -15,6 +15,20 @@ void Pong::addWall(Wall* w)
 void Pong::addMobile(Mobile* m)
 {
 	_mobiles.push_back(m);
+}
+
+
+void Pong::bulletHell()
+{
+	for (list<Mobile*>::iterator enemy=_mobiles.begin();
+			enemy!=_mobiles.end(); enemy++) {
+		if (dynamic_cast<Triangle*>(*enemy) != 0 && enemy != _mobiles.begin()) {
+			for (int i=0; i<3; i++) {
+				addMobile(new Circle((*enemy)->getX(), (*enemy)->getY() - 5,
+					10, 10, 0.0, _MAROON, 2*i*M_PI/3.0, 100, false));
+			}	
+		}
+	}
 }
 
 
@@ -29,14 +43,14 @@ void Pong::collision()
 		double infMobY = (*itM)->getY();
 		double supMobY = infMobY + (*itM)->getHeight();
 
-		for (list<Wall*>::iterator itW=_walls.begin();
+		for (list<Wall>::iterator itW=_walls.begin();
 				itW!=_walls.end(); itW++) {
 
 			//Wall modeling
-	        double infWallX = (*itW)->getX();
-        	double supWallX = infWallX + (*itW)->getWidth();
-    	    double infWallY = (*itW)->getY();
-	        double supWallY = infWallY + (*itW)->getHeight();
+	        double infWallX = itW->getX();
+        	double supWallX = infWallX + itW->getWidth();
+    	    double infWallY = itW->getY();
+	        double supWallY = infWallY + itW->getHeight();
 
 			//Ensure mobiles won't get out of the window (as a last resort !)
 			if (infMobY<=0) {
@@ -109,12 +123,12 @@ void Pong::createBorders()
 {
 	for (int i=0; i<8; i++)	{
 		Color randomColor(rand()%256, rand()%256, rand()%256);
-		addWall(new Wall((i/8.0) * _width, 0.0,				//Position
-						 _wallThickness, _width/8,			//Size
-						 0.0, randomColor, 0));				//Ori, color, coeff
-		addWall(new Wall((i/8.0) * _width, _height - _wallThickness,
-						 _wallThickness, _width/8,
-						 0.0, randomColor, 0));
+		addWall(Wall((i/8.0) * _width, 0.0,				//Position
+					 _wallThickness, _width/8,			//Size
+					 0.0, randomColor, 0));				//Ori, color, coeff
+		addWall(Wall((i/8.0) * _width, _height - _wallThickness,
+					 _wallThickness, _width/8,
+					 0.0, randomColor, 0));
 	}
 /*	for (int i=0; i<5; i++)	{
 		Color randomColor(rand()%256, rand()%256, rand()%256);
@@ -130,9 +144,9 @@ void Pong::createBorders()
 
 void Pong::drawAll()
 {
-	for (list<Wall*>::iterator it=_walls.begin();
+	for (list<Wall>::iterator it=_walls.begin();
 			it!=_walls.end(); it++) {
-		(*it)->draw(_win);
+		it->draw(_win);
 	}
 	for (list<Mobile*>::iterator it=_mobiles.begin();
 			it!=_mobiles.end(); it++) {
@@ -236,11 +250,11 @@ void Pong::hit()
 void Pong::insertEnemies()
 {
 	//The enemies are triangles contained in the _mobiles list
-	for (int i=1; i<500; i++)
+	for (int i=1; i<20; i++)
 	{
 		addMobile(new Triangle(rand()%5000 + _width,
-			rand()%(5*_height/8) + _height/8, 100, 100, M_PI,
-			Color(0,255,0), M_PI, 100, -1, false));
+			rand()%(5*_height/8) + _height/8, 50, 50, M_PI,
+			_GREEN, M_PI, 200, false));
 /*		addMobile(new Circle(3*winW/4, winH/2,
 							 75, 75,
 							 i*M_PI/25.0, red, 100));
@@ -252,7 +266,7 @@ void Pong::insertPlayer()
 {
 	//The player is the first triangle in the _mobiles list
 	addMobile(new Triangle(_width/5.0, _height/2.0, 40, 40, 0.0,
-		Color(0,153,255), 0.0, 0, -1, false));
+		_CRIMSON, 0.0, 0, false));
 }
 
 
@@ -287,28 +301,20 @@ void Pong::movePlayer(bool up, bool down, bool left, bool right)
 }
 
 
-void Pong::popCircles(double dt)
+void Pong::popCircles()
 {
-	// Remove enemies' bullets when their lifeTime is greater than maxLifeTime
-	// and player's bullets when they're out of the window
+	// Remove bullets when they're out of the window
 	for (list<Mobile*>::iterator it=_mobiles.begin();
 			it!=_mobiles.end(); it++) {
 
 		if (dynamic_cast<Circle*>(*it) != 0) {
-			double lT = (*it)->getLifeTime();
-			bool p = (*it)->getPlayersBullet();
-
-			if (p == true) {
-				double infX = (*it)->getX();
-				double supX = infX + (*it)->getWidth();
-				double infY = (*it)->getY();
-				double supY = infY + (*it)->getHeight();
-				if (infX>_width || supX<0.0 || infY>_height || supY<0.0) {
-					it = _mobiles.erase(it);
-				}
+			double infX = (*it)->getX();
+			double supX = infX + (*it)->getWidth();
+			double infY = (*it)->getY();
+			double supY = infY + (*it)->getHeight();
+			if (infX>_width || supX<0.0 || infY>_height || supY<0.0) {
+				it = _mobiles.erase(it);
 			}
-			else if (lT > _maxLifeTime) it = _mobiles.erase(it);
-			else (*it)->setLifeTime(lT + dt);
 		}
 	}
 }
@@ -318,14 +324,7 @@ void Pong::shoot()
 {
 	addMobile(new Circle(_mobiles.front()->getX() + 7, // + circle height / 2
 						 _mobiles.front()->getY() - 7, // - circle height / 2
-						 14,
-						 14,
-						 0.0,
-						 Color(255, 255, 255),
-						 0.0,
-						 1000,
-						 5.0,
-						 true));
+						 14, 14, 0.0, _WHITE, 0.0, 1000, true));
 }
 
 
@@ -338,6 +337,7 @@ void Pong::execute()
 	bool right = false;
 	bool space = false;
 	double shootTimer = 0.0;
+	double bulletHellTimer = 0.0;
 
 	_win->setKeyRepeatEnabled(false);
 	createBorders();
@@ -347,34 +347,38 @@ void Pong::execute()
 	while (_win->isOpen()) {
 		// FPS
 		sf::Time dt = clock.restart();
-		//cout << 1 / dt.asSeconds() << endl;
+		cout << 1 / dt.asSeconds() << endl;
 
-		// Handle enemies' bullets
-		popCircles(dt.asSeconds());
-
-		// Did anyone hit anyone ?
-		hit();
-
-		// Display
-		_win->clear(sf::Color(128, 128, 128));
-		collision();
-		moveAll(dt.asSeconds());
-		drawAll();
-		_win->display();
-
-		// Events
+		// Events & inputs
 		handleEvents(space, up, down, left, right);
 		movePlayer(up, down, left, right);
 
-		// Shoot according to the _fireRate
+		// Shooting (mobiles generation)
+			// Player
 		if (space) {	
 			if (shootTimer <= 0.0) {
 				shoot();
-				shootTimer = _fireRate;
-			}
-			else shootTimer -= dt.asSeconds();
-		}
-		else shootTimer = 0;
-		cout << shootTimer << endl;
+				shootTimer = _shootRate;
+			} else shootTimer -= dt.asSeconds();
+		} else shootTimer = 0;
+			// Enemies
+		if (bulletHellTimer <= 0.0) {
+			bulletHell();
+			bulletHellTimer = _bulletHellRate;
+		} else bulletHellTimer -= dt.asSeconds();
+
+		// Update shapes' characteristics
+		popCircles();					// Remove distant bullets
+		hit();							// Did anyone hit anyone ?
+		collision();					// Collisions between mobiles and walls
+
+		// Apply changes
+		moveAll(dt.asSeconds());
+
+		// Display them
+		_win->clear(sf::Color(128, 128, 128));
+		drawAll();
+		_win->display();
+
 	}
 }

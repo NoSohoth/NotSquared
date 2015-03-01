@@ -8,8 +8,8 @@
 class Triangle : public Mobile {
 	public:
 		Triangle(double x, double y, int h, int w, double o, Color c, double d,
-				int s, double lT, bool p):
-			Mobile(x, y, h, w, o, c, d, s, lT, p) {}
+				int s, bool p):
+			Mobile(x, y, h, w, o, c, d, s, p) {}
 		~Triangle(void) {}
 
 		void move(double dt);

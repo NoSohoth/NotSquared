@@ -8,7 +8,7 @@ OBJ=$(SRC:.cpp=.o)
 
 #-- compiler/linker settings --
 CC=g++
-CCFLAGS=-W -Wall -Wextra -pedantic -g -Wno-long-long -pg -Og
+CCFLAGS=-W -Wall -Wextra -pedantic -g -Wno-long-long
 IFLAGS=-I$(SFMLDIR)/include -I./include
 LDFLAGS=-L$(SFMLDIR)/lib -lsfml-graphics -lsfml-window -lsfml-system \
         -Wl,-rpath,${SFMLDIR}/lib
