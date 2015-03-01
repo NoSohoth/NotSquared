@@ -338,6 +338,7 @@ void Pong::execute()
 	bool space = false;
 	double shootTimer = 0.0;
 	double bulletHellTimer = 0.0;
+	Texture texture(0.0, 0.0, _height, _width, "Textures/background.jpg");
 
 	_win->setKeyRepeatEnabled(false);
 	createBorders();
@@ -376,7 +377,7 @@ void Pong::execute()
 		moveAll(dt.asSeconds());
 
 		// Display them
-		_win->clear(sf::Color(128, 128, 128));
+		texture.draw(_win);
 		drawAll();
 		_win->display();
 

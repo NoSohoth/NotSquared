@@ -7,6 +7,7 @@
 #include "Mobile.hpp"
 #include "Circle.hpp"
 #include "Triangle.hpp"
+#include "Texture.hpp"
 
 class Pong {
 	private:
