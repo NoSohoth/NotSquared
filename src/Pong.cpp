@@ -325,8 +325,14 @@ void Pong::moveAll(double dt)
 
 void Pong::movePlayer(bool up, bool down, bool left, bool right)
 {
-	if (up == false && down == false && left == false && right == false) 
+	double playerX = _mobiles.front()->getX();
+	if ( (up == false && down == false && left == false && right == false)
+		|| (playerX < 0.0)
+		|| (playerX > (double) _width) ) {
 		_mobiles.front()->setSpeed(0);
+		if (playerX < 0.0) _mobiles.front()->setX(playerX + 20);
+		if (playerX > (double) _width) _mobiles.front()->setX(playerX - 20);
+	}
 	else {
 		_mobiles.front()->setSpeed(_movementSpeed);
 		if (up == true) {
