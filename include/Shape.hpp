@@ -5,42 +5,42 @@
 #include "SFML/Graphics.hpp"
 
 class Shape {
-	protected:
-		double _x;
-		double _y;
-		int _height;
-		int _width;
-		double _orientation;
-		Color _color;
+    protected:
+        double _x;
+        double _y;
+        int _height;
+        int _width;
+        double _orientation;
+        Color _color;
 
-	public:
-		Shape(double x, double y, int h, int w, double o, Color c):
-			_x(x),
-			_y(y),
-			_height(h),
-			_width(w),
-			_orientation(o),
-			_color(c) {}
-		~Shape(void) {}
+    public:
+        Shape(double x, double y, int h, int w, double o, Color c):
+            _x(x),
+            _y(y),
+            _height(h),
+            _width(w),
+            _orientation(o),
+            _color(c) {}
+        ~Shape(void) {}
 
-		//Getters
+        //Getters
 
-		double getX() { return _x; }
-		double getY() { return _y; }
-		int getHeight() { return _height; }
-		int getWidth() { return _width; }
-		double getOrientation() { return _orientation; }
+        double getX() { return _x; }
+        double getY() { return _y; }
+        int getHeight() { return _height; }
+        int getWidth() { return _width; }
+        double getOrientation() { return _orientation; }
 
-		//Setters
+        //Setters
 
-		void setX(double x) { _x=x; }
-		void setY(double y) { _y=y; }
-		void setOrientation(double o) { _orientation = o; }
-		void setColor(Color c) { _color=c; }
+        void setX(double x) { _x=x; }
+        void setY(double y) { _y=y; }
+        void setOrientation(double o) { _orientation = o; }
+        void setColor(Color c) { _color=c; }
 
-		//Other methods
+        //Other methods
 
-		virtual void draw(sf::RenderWindow *win) const = 0;
+        virtual void draw(sf::RenderWindow *win) const = 0;
 };
 
 #endif

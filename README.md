@@ -1,7 +1,7 @@
 # NotSquared
 NotSquared is my first C++ project.
 It is a simple manic shooter (Shoot'Em Up) that uses and requires the `SFML` library.
-	
+
 ## Dependencies
 NotSquared uses the `SFML` library. It has been made under the 2.2-3 version but I think that it'll work fine as long as
 you have version 2.

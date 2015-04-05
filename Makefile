@@ -20,25 +20,22 @@ all : $(TARGET)
 #-- linker command to produce the executable file --
 $(TARGET) : $(OBJ)
 	@echo Linking $@ ...
-	$(CC) $^ -o $@ $(LDFLAGS) 
+	$(CC) $^ -o $@ $(LDFLAGS)
 	@echo
 
 #-- compiler command for every source file --
-%.o : %.cpp 
+%.o : %.cpp
 	@echo Compiling $< ....
-	$(CC) -c $< $(IFLAGS) -o $@ $(CCFLAGS) 
+	$(CC) -c $< $(IFLAGS) -o $@ $(CCFLAGS)
 	@echo
 
 .PHONY: clean
 
 #-- system-specific command to remove those files --
-clean : 
+clean :
 	@echo Cleaning...
 	rm -f $(OBJ) $(TARGET) src/*~ include/*~ *~
 	@echo
 
 run :
 	./$(TARGET)
-
-
-
